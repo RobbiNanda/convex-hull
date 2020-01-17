@@ -21,7 +21,7 @@ public class Tucil_13518100 {
         }
 
         public void printPoint() {
-            System.out.printf("(%d, %d) ", this.absis, this.ordinat);
+            System.out.printf("(%d, %d)", this.absis, this.ordinat);
         }
     } 
 
@@ -100,6 +100,9 @@ public class Tucil_13518100 {
         int minPoint = 0;
         int maxPoint = 100;
 
+        long startTime;
+        long endTime;
+
         /* Generate array of Point by random */
         Point[] points = new Point[N];
         for (int i = 0; i < N; i++) {
@@ -123,13 +126,16 @@ public class Tucil_13518100 {
         if (N <= 3) {
             /* If number of points is less and equal than 3, then
             all the points is part of convex hull */
+            startTime = System.nanoTime();
             for (int i = 0; i < N; i++) {
                 convexList.ch[i] = points[i];
             }
             convexList.ch[N] = points[0];
             convexList.nEff = N + 1;
+            endTime = System.nanoTime();
         } else {
             /* Find the first convex line */
+            startTime = System.nanoTime();
             boolean done = false;
             boolean firstConvexFound = false;
             int i = 0;
@@ -157,11 +163,6 @@ public class Tucil_13518100 {
                             k++;
                         }
                     
-                        System.out.print("i: ");
-                        points[i].printPoint();
-                        System.out.print("j: ");
-                        points[j].printPoint();
-                        System.out.print(tabInt.isConvex());
                         /* points[i] and points[j] are the first convex hull found */
                         if (tabInt.isConvex() && convexList.nEff == 0) {
                             convexList.ch[convexList.nEff++] = points[i];
@@ -173,64 +174,26 @@ public class Tucil_13518100 {
                         /* points[j] are part of the convex hull */
                         else if (tabInt.isConvex()) {
                             if (!unit.isEqual(points[j], convexList.ch[convexList.nEff - 2])) {
-                                System.out.print("This");
-                                points[j].printPoint();
                                 convexList.ch[convexList.nEff++] = points[j];
                                 convexFound = true;
                                 i = j;
                             }
-                            if (unit.isEqual(points[j], convexList.ch[0]) && convexLit.nEff != 2) {
-                                System.out.print("Or This");
-                                points[j].printPoint();
+                            if (unit.isEqual(points[j], convexList.ch[0]) && convexList.nEff != 2) {
                                 done = true;
                             }
                         }
-                        
                     }
                     j++;
                 }
                 if (!firstConvexFound) {
                     i++;
                 }
+                if (!convexFound && convexList.nEff != 0) {
+                    convexList.ch[convexList.nEff++] = convexList.ch[0];
+                    done = true;
+                }
             }
-            
-            // i--;
-            // while (i < N) {
-                
-            //     boolean convexFound = false;
-            //     int j = 0;
-            //     while (j < N && !convexFound) {
-            //         if (i != j && !unit.isEqual(convexList.ch[convexList.nEff -2], points[j])) {
-            //             int a = unit.getA(points[i], points[j]);
-            //             int b = unit.getB(points[i], points[j]);
-            //             int c = unit.getC(points[i], points[j]);
-                    
-            //             TabInt tabInt = new TabInt();
-            //             int k = 0;
-            //             while (k < N) {
-            //                 if (k != i && k != j) {
-            //                     int d = unit.calculateLineEquation(a, b, c, points[k]);
-            //                     if (d != 0) {
-            //                         tabInt.ti[tabInt.nEff] = d;
-            //                         tabInt.nEff += 1;
-            //                     }
-            //                 }
-            //                 k++;
-            //             }
-                        
-            //             if (tabInt.isConvex()) {
-            //                 points[i].printPoint();
-            //                 points[j].printPoint();
-            //                 convexFound = true;
-            //                 i = j;
-            //             }
-            //         }
-            //         j++;
-            //     }
-            //     if (!convexFound) {
-            //         break;
-            //     }
-            // }
+            endTime = System.nanoTime();
         }
 
         /* Make function to check all points are in the same segment given a linear equation */
@@ -238,11 +201,16 @@ public class Tucil_13518100 {
 
 
         /* Print output */
-        System.out.println(convexList.nEff);
-        System.out.print("[ ");
+        System.out.print("[");
         for (int i = 0; i < convexList.nEff; i++) {
             convexList.ch[i].printPoint();
+            if (i != convexList.nEff - 1) {
+                System.out.print(", ");
+            }
         }
-        System.out.print("]");
+        System.out.println("]");
+        
+        System.out.print("Time taken: ");
+        System.out.println((endTime - startTime));
     }
 }
