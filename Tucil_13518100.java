@@ -81,14 +81,14 @@ public class Tucil_13518100 {
         }
         
         public boolean isConvex() {
-            int result;
+            int result = 0;
             for (int i = 1; i < this.nEff; i++) {
                 result = this.ti[0] * this.ti[i];
                 if (result == -1) {
                     return false;
                 }
             }
-            return true;
+            return result == 1;
         }
     }
     
@@ -157,6 +157,11 @@ public class Tucil_13518100 {
                             k++;
                         }
                     
+                        System.out.print("i: ");
+                        points[i].printPoint();
+                        System.out.print("j: ");
+                        points[j].printPoint();
+                        System.out.print(tabInt.isConvex());
                         /* points[i] and points[j] are the first convex hull found */
                         if (tabInt.isConvex() && convexList.nEff == 0) {
                             convexList.ch[convexList.nEff++] = points[i];
@@ -167,12 +172,16 @@ public class Tucil_13518100 {
                         } 
                         /* points[j] are part of the convex hull */
                         else if (tabInt.isConvex()) {
-                            if (!isEqual(points[j], convexList.ch[convexList.nEff - 2)]) {
+                            if (!unit.isEqual(points[j], convexList.ch[convexList.nEff - 2])) {
+                                System.out.print("This");
+                                points[j].printPoint();
                                 convexList.ch[convexList.nEff++] = points[j];
                                 convexFound = true;
                                 i = j;
                             }
-                            if (unit.isEqual(points[j], convexList.ch[0])) {
+                            if (unit.isEqual(points[j], convexList.ch[0]) && convexLit.nEff != 2) {
+                                System.out.print("Or This");
+                                points[j].printPoint();
                                 done = true;
                             }
                         }
@@ -229,6 +238,7 @@ public class Tucil_13518100 {
 
 
         /* Print output */
+        System.out.println(convexList.nEff);
         System.out.print("[ ");
         for (int i = 0; i < convexList.nEff; i++) {
             convexList.ch[i].printPoint();
