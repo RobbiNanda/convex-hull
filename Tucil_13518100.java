@@ -94,6 +94,8 @@ public class Tucil_13518100 {
 
                     int k = j + 1;
                     boolean isConvex = true;
+
+                    /* Check all other points are on the same side*/
                     int sign = 0;
                     if (points[j + 1].absis * a + points[j + 1].ordinat * b - c > 0) {
                         sign = 1;
@@ -117,33 +119,33 @@ public class Tucil_13518100 {
                         convexList[1] = points[j];
                         i = j;
                         firstConvexNotFound = false;
-                        convexListNEff = 2;
+                        convexListNEff = 1;
                     }
                     j++;
                 }
                 i++;
-            }
-
+            }   
+            
             i--;
-            int index = 1;
-            /* Finding other convex start by convexList[1] */
-            while (!unit.isEqual(points[i], convexList[0])) {
+
+            while (convexListNEff <= N && !unit.isEqual(points[i], convexList[0])) {
                 int j = 0;
-                boolean convexFound = false;
-                while (!convexFound) {
-                    boolean isConvex = true;
-                    if (!unit.isEqual(points[j], convexList[index - 1]) &&
-                        !unit.isEqual(points[j], convexList[i])) {
-                     
+                boolean found = false;
+                while (j < N && !found) {
+                    if (!unit.isEqual(points[j], points[i]) &&
+                        !unit.isEqual(points[j], convexList[convexListNEff - 1])) {
+
                         int a = unit.getA(points[i], points[j]);
                         int b = unit.getB(points[i], points[j]);
                         int c = unit.getC(points[i], points[j]);
 
                         int k = 0;
+                        boolean isConvex = true;
+                        /* Check all other points are on the same side*/
                         int sign = 0;
-                        if (points[k].absis * a + points[k].ordinat * b - c > 0) {
+                        if (points[0].absis * a + points[0].ordinat * b - c > 0) {
                             sign = 1;
-                        } else if (points[k].absis * a + points[k].ordinat * b - c < 0) {
+                        } else if (points[0].absis * a + points[0].ordinat * b - c < 0) {
                             sign = -1;
                         }
                         while ((k < N) && isConvex) {
@@ -159,16 +161,17 @@ public class Tucil_13518100 {
                             k++;
                         }
                         if (isConvex) {
-                            convexList[index++] = points[j];
-                            convexFound = true;
+                            found = true;
+                            convexList[convexListNEff] = points[j];
                             convexListNEff++;
                         }
                     }
                     j++;
-                i = j - 1;
                 }
+                i = j - 1;
             }
         }
+
 
 
         /* Print output */
