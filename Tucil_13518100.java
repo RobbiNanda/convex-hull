@@ -125,23 +125,25 @@ public class Tucil_13518100 {
             }
 
             i--;
+            int index = 1;
             /* Finding other convex start by convexList[1] */
-            int ind = 1;
             while (!unit.isEqual(points[i], convexList[0])) {
-                boolean found = false;
                 int j = 0;
-                while (!found) {
-          
+                boolean convexFound = false;
+                while (!convexFound) {
+                    boolean isConvex = true;
+                    if (!unit.isEqual(points[j], convexList[index - 1]) &&
+                        !unit.isEqual(points[j], convexList[i])) {
+                     
                         int a = unit.getA(points[i], points[j]);
                         int b = unit.getB(points[i], points[j]);
                         int c = unit.getC(points[i], points[j]);
 
-                        int k = j + 1;
-                        boolean isConvex = true;
+                        int k = 0;
                         int sign = 0;
-                        if (points[j + 1].absis * a + points[j + 1].ordinat * b - c > 0) {
+                        if (points[k].absis * a + points[k].ordinat * b - c > 0) {
                             sign = 1;
-                        } else if (points[j + 1].absis * a + points[j + 1].ordinat * b - c < 0) {
+                        } else if (points[k].absis * a + points[k].ordinat * b - c < 0) {
                             sign = -1;
                         }
                         while ((k < N) && isConvex) {
@@ -157,21 +159,21 @@ public class Tucil_13518100 {
                             k++;
                         }
                         if (isConvex) {
-                            convexList[ind++] = points[j];
-                            found = true;
+                            convexList[index++] = points[j];
+                            convexFound = true;
                             convexListNEff++;
                         }
-                    
+                    }
                     j++;
-                }
                 i = j - 1;
+                }
             }
         }
 
 
         /* Print output */
         System.out.print("[ ");
-        for (int i = 0; i < convexListNEff - 1; i++) {
+        for (int i = 0; i < convexListNEff; i++) {
             convexList[i].printPoint();
         }
         System.out.print("]");
