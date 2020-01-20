@@ -37,12 +37,16 @@ public class Tucil_13518100 {
         public int getC(Point P1, Point P2) {
             return P1.absis * P2.ordinat - P2.absis * P2.ordinat;
         }
+
+        public boolean isEqual(Point P1, Point P2) {
+            return P1.absis == P2.absis && P1.ordinat == P2.ordinat;
+        }
     }
 
     public static void main(String args[]) {
         /* Input how many points user want to generate */
         Scanner in = new Scanner(System.in);
-        int N = Integer.parseInt(JOptionPane.showInputDialog("Masukkan jumlah titik: "));
+        int N = Integer.parseInt(JOptionPane.showInputDialog("Enter number of points: "));
         int minPoint = 0;
         int maxPoint = 100;
 
@@ -55,56 +59,121 @@ public class Tucil_13518100 {
             Point p = new Point(x, y);
             points[i] = p;
             points[i].printPoint();
+            System.out.println();
         }
+
+        /* Object to perform some Point calculation */
+        Unit unit = new Unit();
 
         /* BRUTE FORCE ALGORITHM */
         /* Create list of points that belong to part of convex hull */
+        /* Notice that number of element effective is less than N + 1 */
         Point[] convexList = new Point[N + 1];
+        int convexListNEff = 0;
 
-        /* Finding the first convex hull line segment */
-        boolean firstConvexNotFound = true;
-        int i = 0;
-        while (i < N - 1 && firstConvexNotFound) {
-
-            int j = i + 1;
-            while (j < N && firstConvexNotFound) {
-
-                Unit unit = new Unit();
-                int a = unit.getA(points[i], points[j]);
-                int b = unit.getB(points[i], points[j]);
-                int c = unit.getC(points[i], points[j]);
-
-                int k = j + 1;
-                boolean isConvex = true;
-                int sign = 0;
-                if (points[j + 1].absis * a + points[j + 1].ordinat * b - c > 0) {
-                    sign = 1;
-                } else if (points[j + 1].absis * a + points[j + 1].ordinat * b - c < 0) {
-                    sign = -1;
-                }
-                while ((k < N) && isConvex) {
-                    if (points[k].absis * a + points[k].ordinat * b - c > 0) {
-                        if (sign == -1) {
-                            isConvex = false;
-                        }    
-                    } else if (points[k].absis * a + points[k].ordinat * b - c < 0) {
-                        if (sign == 1) {
-                            isConvex = false;
-                        }    
-                    }
-                    k++;
-                }
-                if (isConvex) {
-                    convexList[0] = points[i];
-                    convexList[1] = points[j];
-                    firstConvexNotFound = false;
-                }
-                j++;
+        if (N <= 3) {
+            /* If number of points is less and equal than 3, then
+            all the points is part of convex hull */
+            for (int i = 0; i < N; i++) {
+                convexList[i] = points[i];
             }
-            i++;
+            convexList[N] = points[0];
+            convexListNEff = N + 1;
+        } else {
+            /* Finding the first convex hull line segment */
+            boolean firstConvexNotFound = true;
+            int i = 0;
+            while (i < N - 1 && firstConvexNotFound) {
+
+                int j = i + 1;
+                while (j < N && firstConvexNotFound) {
+
+                    int a = unit.getA(points[i], points[j]);
+                    int b = unit.getB(points[i], points[j]);
+                    int c = unit.getC(points[i], points[j]);
+
+                    int k = j + 1;
+                    boolean isConvex = true;
+                    int sign = 0;
+                    if (points[j + 1].absis * a + points[j + 1].ordinat * b - c > 0) {
+                        sign = 1;
+                    } else if (points[j + 1].absis * a + points[j + 1].ordinat * b - c < 0) {
+                        sign = -1;
+                    }
+                    while ((k < N) && isConvex) {
+                        if (points[k].absis * a + points[k].ordinat * b - c > 0) {
+                            if (sign == -1) {
+                                isConvex = false;
+                            }    
+                        } else if (points[k].absis * a + points[k].ordinat * b - c < 0) {
+                            if (sign == 1) {
+                                isConvex = false;
+                            }    
+                        }
+                        k++;
+                    }
+                    if (isConvex) {
+                        convexList[0] = points[i];
+                        convexList[1] = points[j];
+                        i = j;
+                        firstConvexNotFound = false;
+                        convexListNEff = 2;
+                    }
+                    j++;
+                }
+                i++;
+            }
+
+            i--;
+            /* Finding other convex start by convexList[1] */
+            int ind = 1;
+            while (!unit.isEqual(points[i], convexList[0])) {
+                boolean found = false;
+                int j = 0;
+                while (!found) {
+          
+                        int a = unit.getA(points[i], points[j]);
+                        int b = unit.getB(points[i], points[j]);
+                        int c = unit.getC(points[i], points[j]);
+
+                        int k = j + 1;
+                        boolean isConvex = true;
+                        int sign = 0;
+                        if (points[j + 1].absis * a + points[j + 1].ordinat * b - c > 0) {
+                            sign = 1;
+                        } else if (points[j + 1].absis * a + points[j + 1].ordinat * b - c < 0) {
+                            sign = -1;
+                        }
+                        while ((k < N) && isConvex) {
+                            if (points[k].absis * a + points[k].ordinat * b - c > 0) {
+                                if (sign == -1) {
+                                    isConvex = false;
+                                }    
+                            } else if (points[k].absis * a + points[k].ordinat * b - c < 0) {
+                                if (sign == 1) {
+                                    isConvex = false;
+                                }    
+                            }
+                            k++;
+                        }
+                        if (isConvex) {
+                            convexList[ind++] = points[j];
+                            found = true;
+                            convexListNEff++;
+                        }
+                    
+                    j++;
+                }
+                i = j - 1;
+            }
         }
 
-        convexList[0].printPoint();
-        convexList[1].printPoint();
+
+        /* Print output */
+        System.out.print("[ ");
+        for (int i = 0; i < convexListNEff - 1; i++) {
+            convexList[i].printPoint();
+        }
+        System.out.print("]");
     }
 }
