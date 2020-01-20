@@ -68,7 +68,7 @@ public class Tucil_13518100 {
         /* BRUTE FORCE ALGORITHM */
         /* Create list of points that belong to part of convex hull */
         /* Notice that number of element effective is less than N + 1 */
-        Point[] convexList = new Point[N + 1];
+        Point[] convexList = new Point[N * 2 + 1];
         int convexListNEff = 0;
 
         if (N <= 3) {
@@ -80,97 +80,31 @@ public class Tucil_13518100 {
             convexList[N] = points[0];
             convexListNEff = N + 1;
         } else {
-            /* Finding the first convex hull line segment */
-            boolean firstConvexNotFound = true;
-            int i = 0;
-            while (i < N - 1 && firstConvexNotFound) {
-
-                int j = i + 1;
-                while (j < N && firstConvexNotFound) {
-
+            for (int i = 0; i < N - 1; i++) {
+                for (int j = i + 1; j < N; j++) {
                     int a = unit.getA(points[i], points[j]);
                     int b = unit.getB(points[i], points[j]);
                     int c = unit.getC(points[i], points[j]);
-
-                    int k = j + 1;
                     boolean isConvex = true;
-
-                    /* Check all other points are on the same side*/
-                    int sign = 0;
-                    if (points[j + 1].absis * a + points[j + 1].ordinat * b - c > 0) {
-                        sign = 1;
-                    } else if (points[j + 1].absis * a + points[j + 1].ordinat * b - c < 0) {
-                        sign = -1;
-                    }
-                    while ((k < N) && isConvex) {
-                        if (points[k].absis * a + points[k].ordinat * b - c > 0) {
-                            if (sign == -1) {
+                    for (int k = 0; k < N - 1; k++) {
+                        /* find the sign of ax + by - c for each other n - 2 points */
+                        if (a * points[k].absis + b * points[k].ordinat - c != 0) { 
+                            if ((a * points[k].absis + b * points[k].ordinat - c)
+                                * (a * points[k + 1].absis + b * points[k + 1].ordinat - c) < 0) {
                                 isConvex = false;
-                            }    
-                        } else if (points[k].absis * a + points[k].ordinat * b - c < 0) {
-                            if (sign == 1) {
-                                isConvex = false;
-                            }    
+                            }
                         }
-                        k++;
                     }
                     if (isConvex) {
-                        convexList[0] = points[i];
-                        convexList[1] = points[j];
-                        i = j;
-                        firstConvexNotFound = false;
-                        convexListNEff = 1;
+                        convexList[convexListNEff] = points[i];
+                        convexList[convexListNEff++] = points[j];   
                     }
-                    j++;
+                    convexListNEff++;
                 }
-                i++;
-            }   
-            
-            i--;
-
-            while (convexListNEff <= N && !unit.isEqual(points[i], convexList[0])) {
-                int j = 0;
-                boolean found = false;
-                while (j < N && !found) {
-                    if (!unit.isEqual(points[j], points[i]) &&
-                        !unit.isEqual(points[j], convexList[convexListNEff - 1])) {
-
-                        int a = unit.getA(points[i], points[j]);
-                        int b = unit.getB(points[i], points[j]);
-                        int c = unit.getC(points[i], points[j]);
-
-                        int k = 0;
-                        boolean isConvex = true;
-                        /* Check all other points are on the same side*/
-                        int sign = 0;
-                        if (points[0].absis * a + points[0].ordinat * b - c > 0) {
-                            sign = 1;
-                        } else if (points[0].absis * a + points[0].ordinat * b - c < 0) {
-                            sign = -1;
-                        }
-                        while ((k < N) && isConvex) {
-                            if (points[k].absis * a + points[k].ordinat * b - c > 0) {
-                                if (sign == -1) {
-                                    isConvex = false;
-                                }    
-                            } else if (points[k].absis * a + points[k].ordinat * b - c < 0) {
-                                if (sign == 1) {
-                                    isConvex = false;
-                                }    
-                            }
-                            k++;
-                        }
-                        if (isConvex) {
-                            found = true;
-                            convexList[convexListNEff] = points[j];
-                            convexListNEff++;
-                        }
-                    }
-                    j++;
-                }
-                i = j - 1;
             }
         }
+
+        /* Make function to check all points are in the same segment given a linear equation */
 
 
 
