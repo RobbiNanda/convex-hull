@@ -35,18 +35,68 @@ public class Tucil_13518100 {
         }
 
         public int getC(Point P1, Point P2) {
-            return P1.absis * P2.ordinat - P2.absis * P2.ordinat;
+            return P1.absis * P2.ordinat - P2.absis * P1.ordinat;
         }
 
         public boolean isEqual(Point P1, Point P2) {
             return P1.absis == P2.absis && P1.ordinat == P2.ordinat;
         }
+        
+        public int calculateLineEquation(int a, int b, int c, Point p) {
+            int d = a * p.absis + b * p.ordinat - c;
+            if (d > 0) {
+                return 1;
+            } else if (d < 0) {
+                return -1;
+            } else {
+                return 0;
+            }
+        } 
     }
 
+    public static class ConvexList {
+        public Point[] ch;
+        public int nEff;
+        
+        public ConvexList() {
+            ch = new Point[100];
+            nEff = 0;
+        }
+    }
+
+    public static class TabInt {
+        public int[] ti;
+        public int nEff;
+        
+        public TabInt() {
+            ti = new int[100];
+            nEff = 0;
+        }
+        
+        public void printTab() {
+            for (int i = 0; i < this.nEff; i++) {
+                System.out.print(this.ti[i]);
+                System.out.print(' ');
+            }
+        }
+        
+        public boolean isConvex() {
+            int result;
+            for (int i = 1; i < this.nEff; i++) {
+                result = this.ti[0] * this.ti[i];
+                if (result == -1) {
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
+    
     public static void main(String args[]) {
         /* Input how many points user want to generate */
         Scanner in = new Scanner(System.in);
-        int N = Integer.parseInt(JOptionPane.showInputDialog("Enter number of points: "));
+        // int N = Integer.parseInt(JOptionPane.showInputDialog("Enter number of points: "));
+        int N = in.nextInt();
         int minPoint = 0;
         int maxPoint = 100;
 
@@ -68,40 +118,87 @@ public class Tucil_13518100 {
         /* BRUTE FORCE ALGORITHM */
         /* Create list of points that belong to part of convex hull */
         /* Notice that number of element effective is less than N + 1 */
-        Point[] convexList = new Point[N * 2 + 1];
-        int convexListNEff = 0;
+        ConvexList convexList = new ConvexList();
 
         if (N <= 3) {
             /* If number of points is less and equal than 3, then
             all the points is part of convex hull */
             for (int i = 0; i < N; i++) {
-                convexList[i] = points[i];
+                convexList.ch[i] = points[i];
             }
-            convexList[N] = points[0];
-            convexListNEff = N + 1;
+            convexList.ch[N] = points[0];
+            convexList.nEff = N + 1;
         } else {
-            for (int i = 0; i < N - 1; i++) {
-                for (int j = i + 1; j < N; j++) {
-                    int a = unit.getA(points[i], points[j]);
-                    int b = unit.getB(points[i], points[j]);
-                    int c = unit.getC(points[i], points[j]);
-                    boolean isConvex = true;
-                    for (int k = 0; k < N - 1; k++) {
-                        /* find the sign of ax + by - c for each other n - 2 points */
-                        if (a * points[k].absis + b * points[k].ordinat - c != 0) { 
-                            if ((a * points[k].absis + b * points[k].ordinat - c)
-                                * (a * points[k + 1].absis + b * points[k + 1].ordinat - c) < 0) {
-                                isConvex = false;
+            /* Find the first convex line */
+            int i = 0;
+            while (i < N - 1) {
+                int j = 0;
+                while (j < N) {
+                    if (j != i) {
+                        int a = unit.getA(points[i], points[j]);
+                        int b = unit.getB(points[i], points[j]);
+                        int c = unit.getC(points[i], points[j]);
+                        
+                        TabInt tabInt = new TabInt();
+                        int k = 0;
+                        while (k < N) {
+                            if (k != i && k != j) {
+                                int d = unit.calculateLineEquation(a, b, c, points[k]);
+                                if (d != 0) {
+                                    tabInt.ti[tabInt.nEff] = d;
+                                    tabInt.nEff += 1;
+                                }
                             }
+                            k++;
+                        }
+                    
+                        if (tabInt.isConvex()) {
+                            convexList.ch[convexList.nEff++] = points[i];
+                            convexList.ch[convexList.nEff++] = points[j];
                         }
                     }
-                    if (isConvex) {
-                        convexList[convexListNEff] = points[i];
-                        convexList[convexListNEff++] = points[j];   
-                    }
-                    convexListNEff++;
+                    j++;
                 }
+                i++;
             }
+            
+            // i--;
+            // while (i < N) {
+                
+            //     boolean convexFound = false;
+            //     int j = 0;
+            //     while (j < N && !convexFound) {
+            //         if (i != j && !unit.isEqual(convexList.ch[convexList.nEff -2], points[j])) {
+            //             int a = unit.getA(points[i], points[j]);
+            //             int b = unit.getB(points[i], points[j]);
+            //             int c = unit.getC(points[i], points[j]);
+                    
+            //             TabInt tabInt = new TabInt();
+            //             int k = 0;
+            //             while (k < N) {
+            //                 if (k != i && k != j) {
+            //                     int d = unit.calculateLineEquation(a, b, c, points[k]);
+            //                     if (d != 0) {
+            //                         tabInt.ti[tabInt.nEff] = d;
+            //                         tabInt.nEff += 1;
+            //                     }
+            //                 }
+            //                 k++;
+            //             }
+                        
+            //             if (tabInt.isConvex()) {
+            //                 points[i].printPoint();
+            //                 points[j].printPoint();
+            //                 convexFound = true;
+            //                 i = j;
+            //             }
+            //         }
+            //         j++;
+            //     }
+            //     if (!convexFound) {
+            //         break;
+            //     }
+            // }
         }
 
         /* Make function to check all points are in the same segment given a linear equation */
@@ -110,8 +207,8 @@ public class Tucil_13518100 {
 
         /* Print output */
         System.out.print("[ ");
-        for (int i = 0; i < convexListNEff; i++) {
-            convexList[i].printPoint();
+        for (int i = 0; i < convexList.nEff; i++) {
+            convexList.ch[i].printPoint();
         }
         System.out.print("]");
     }
