@@ -130,11 +130,16 @@ public class Tucil_13518100 {
             convexList.nEff = N + 1;
         } else {
             /* Find the first convex line */
+            boolean done = false;
+            boolean firstConvexFound = false;
             int i = 0;
-            while (i < N - 1) {
+            while (!done) {
+                boolean convexFound = false;
                 int j = 0;
-                while (j < N) {
+                while (j < N && !convexFound) {
                     if (j != i) {
+                        
+                        /* Test is points[i] and points[j] are part of convex hull */
                         int a = unit.getA(points[i], points[j]);
                         int b = unit.getB(points[i], points[j]);
                         int c = unit.getC(points[i], points[j]);
@@ -152,14 +157,32 @@ public class Tucil_13518100 {
                             k++;
                         }
                     
-                        if (tabInt.isConvex()) {
+                        /* points[i] and points[j] are the first convex hull found */
+                        if (tabInt.isConvex() && convexList.nEff == 0) {
                             convexList.ch[convexList.nEff++] = points[i];
                             convexList.ch[convexList.nEff++] = points[j];
+                            firstConvexFound = true;
+                            convexFound = true;
+                            i = j;
+                        } 
+                        /* points[j] are part of the convex hull */
+                        else if (tabInt.isConvex()) {
+                            if (!isEqual(points[j], convexList.ch[convexList.nEff - 2)]) {
+                                convexList.ch[convexList.nEff++] = points[j];
+                                convexFound = true;
+                                i = j;
+                            }
+                            if (unit.isEqual(points[j], convexList.ch[0])) {
+                                done = true;
+                            }
                         }
+                        
                     }
                     j++;
                 }
-                i++;
+                if (!firstConvexFound) {
+                    i++;
+                }
             }
             
             // i--;
