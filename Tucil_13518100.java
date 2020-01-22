@@ -1,3 +1,9 @@
+/* Nama		: Kevin Rizki Mohammad */
+/* NIM 		: 13518100 */
+/* Tanggal	: 22 Jan 2020 */
+/* Deskripsi	: Penerapan algoritma brute force untuk masalah mencari convex 
+		  hull dari himpunan titik pada bidang */
+
 import java.util.*;
 import javax.swing.JOptionPane;
 
@@ -211,6 +217,7 @@ public class Tucil_13518100 {
         System.out.println("]");
         
         System.out.print("Time taken: ");
-        System.out.println((endTime - startTime));
+        System.out.print((endTime - startTime));
+        System.out.println(" nano seconds");
     }
 }
